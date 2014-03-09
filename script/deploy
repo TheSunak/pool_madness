@@ -26,7 +26,7 @@
 bundle exec rake assets:precompile
 git add .
 git ci -m"precompile assets for heroku"
-git push bigten-staging bt:master
+git push -f bigten-staging bt:master
 bundle exec rake figaro:heroku[bigten-staging] #[${heroku_app}]
 heroku run rake db:migrate --remote bigten-staging --app bigten-staging
 
