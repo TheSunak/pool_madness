@@ -33,17 +33,11 @@ class BracketsController < ApplicationController
   end
 
   def update
-    if params[:bracket][:pending_payment]
-      @bracket.bitcoin_payment_submited!
-      flash[:notice] = "Thank you. Your bitcoin payment is being processed."
-      render :nothing => true
+    if @bracket.update_attributes(params[:bracket])
+      redirect_to @bracket, :notice => 'Bracket Saved'
     else
-      if @bracket.update_attributes(params[:bracket])
-        redirect_to @bracket, :notice => 'Bracket Saved'
-      else
-        flash.now[:alert] = 'Problem saving bracket. Please try again'
-        render :edit
-      end
+      flash.now[:alert] = 'Problem saving bracket. Please try again'
+      render :edit
     end
   end
 
