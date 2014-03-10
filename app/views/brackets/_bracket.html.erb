@@ -9,7 +9,18 @@
         <%= render :partial => 'brackets/round', :locals => {:round_num => round_num, :bracket => (bracket ||= nil)} %>
     <% end %>
 
-    <% winner = bracket.present? ? bracket.picks.where(:game_id => Game.championship.id).first.team : Game.championship.winner %>
+
+    <%
+       championship_game = Game.championship
+
+       if bracket.present?
+         winner_pick = bracket.picks.where(:game_id => championship_game.id).first
+         winner_team = winner_pick.team
+       else
+         winner_team = championship_game.winner
+       end
+
+    %>
 
     <div id="round5" class="round">
       <h3>
@@ -17,26 +28,58 @@
       </h3>
       <div class="region region1">
         <div id="winner" class="match m1">
-          <p class="slot slot2 <%= "team#{winner.id}" if winner.present? %>">
+          <p class="slot slot2 <%= "team#{winner_team.id}" if winner_team.present? %>">
 
-            <% if winner.present? %>
-                <% if Game.championship.winner.present? %>
-                    <% if Game.championship.winner == winner %>
+            <% if winner_team.present? %>
+
+                <% if winner_pick.present? %>
+                  <% if championship_game.winner.present? %>
+                    <% if championship_game.winner == winner_pick.team %>
+                        <strong>
+                    <% else %>
+                        <strike>
+                    <% end %>
+                        <% elsif winner_team.eliminated? %>
+                    <strike>
+                        <% end %>
+                <% else #winner_pick.blank? %>
+                <% if championship_game.winner.present? %>
+                    <% if championship_game.winner == winner_team %>
                         <strong>
                     <% else %>
                         <strike>
                     <% end %>
                 <% end %>
-                <span class="seed"><%= winner.seed %></span>
-                <%= winner.name %>
-                <% if Game.championship.score_one.present? %><em class="score"><%= Game.championship.score_one %></em><% end %>
-                <% if Game.championship.winner.present? %>
-                    <% if Game.championship.winner != winner %>
-                        </strike>
-                    <% else %>
-                        </strong>
+                <% end %>
+
+                <span class="seed"><%= winner_team.seed %></span>
+                <%= winner_team.name %>
+
+
+                <% if winner_pick.present? %>
+                    <% if championship_game.winner.present? %>
+                        <% if championship_game.winner != winner_team %>
+                                </strike>
+                            <% else %>
+                                </strong>
+                            <% end %>
+                    <% elsif winner_team.eliminated? %>
+                            </strike>
+                        <% end %>
+                <% else #pick.blank? %>
+
+
+
+
+                    <% if championship_game.winner.present? %>
+                        <% if championship_game.winner != winner_team %>
+                            </strike>
+                        <% else %>
+                            </strong>
+                        <% end %>
                     <% end %>
                 <% end %>
+
             <% end %>
           </p>
         </div>
