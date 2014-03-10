@@ -17,124 +17,35 @@ user = User.find_or_create_by_email :name => ENV['ADMIN_NAME'].dup, :email => EN
 puts 'user: ' << user.name
 user.add_role :admin
 
-{
-    Team::MIDWEST => [
-        'Louisville',
-        'Duke',
-        'Michigan St',
-        'St Louis',
-        'Oklahoma St',
-        'Memphis',
-        'Creighton',
-        'Colorado St',
-        'Missouri',
-        'Cincinnati',
-        'Play-In MW11',
-        'Oregon',
-        'New Mex St',
-        'Valparaiso',
-        'Albany',
-        'Play-In MW16'
-    ],
-    Team::WEST => [
-        'Gonzaga',
-        'Ohio St',
-        'New Mexico',
-        'Kansas St',
-        'Wisconsin',
-        'Arizona',
-        'Notre Dame',
-        'Pittsburgh',
-        'Wichita St',
-        'Iowa St',
-        'Belmont',
-        'Ole Miss',
-        'Play-In W13',
-        'Harvard',
-        'Iona',
-        'Southern U'
-    ],
-    Team::SOUTH => [
-        'Kansas',
-        'Georgetown',
-        'Florida',
-        'Michigan',
-        'VCU',
-        'UCLA',
-        'San Diego St',
-        'N Carolina',
-        'Villanova',
-        'Oklahoma',
-        'Minnesota',
-        'Akron',
-        'S Dakota St',
-        'NW State',
-        'Fla Gulf Coast',
-        'W Kentucky'
-    ],
-    Team::EAST => [
-        'Indiana',
-        'Miami (FL)',
-        'Marquette',
-        'Syracuse',
-        'UNLV',
-        'Butler',
-        'Illinois',
-        'NC State',
-        'Temple',
-        'Colorado',
-        'Bucknell',
-        'California',
-        'Montana',
-        'Davidson',
-        'Pacific',
-        'Play-In E16'
-    ]
-}.each do |region, team_names|
-  team_names.each_with_index do |name, i|
-    Team.create :region => region, :seed => i+1, :name => name
-  end
+[
+    'Michigan',
+    'Wisconsin',
+    'Michigan State',
+    'Nebraska',
+    'Ohio State',
+    'Iowa',
+    'Minnesota',
+    'Indiana',
+    'Illinois',
+    'Penn State',
+    'Northwestern',
+    'Purdue'
+].each_with_index do |name, i|
+  Team.create :seed => i+1, :name => name
 end
 
-Team::REGIONS.each do |region|
-  #64 teams
-  i, j = 1, 16
-  while i < j
-    team_one = Team.find_by_region_and_seed(region, i)
-    team_two = Team.find_by_region_and_seed(region, j)
-    Game.create :team_one => team_one, :team_two => team_two
-    i += 1
-    j -= 1
-  end
+teams = [0] + Team.order(:seed).all
+games = [nil]
 
-  #32 teams
-  [[1,8], [5,4], [6,3], [7,2]].each do |one, two|
-    game_one = Game.find_by_team_one_id(Team.find_by_region_and_seed(region, one))
-    game_two = Game.find_by_team_one_id(Team.find_by_region_and_seed(region, two))
-    Game.create :game_one => game_one, :game_two => game_two
-  end
 
-  #Sweet 16
-  [[1,5], [6, 7]].each do |one, two|
-    game_one = Game.find_by_team_one_id(Team.find_by_region_and_seed(region, one)).next_game
-    game_two = Game.find_by_team_one_id(Team.find_by_region_and_seed(region, two)).next_game
-    Game.create :game_one => game_one, :game_two => game_two
-  end
-
-  #Great 8
-  game_one = Game.find_by_team_one_id(Team.find_by_region_and_seed(region, 1)).next_game.next_game
-  game_two = Game.find_by_team_one_id(Team.find_by_region_and_seed(region, 6)).next_game.next_game
-  Game.create :game_one => game_one, :game_two => game_two
+[[8,9],[5,12],[7,10],[6,11]].each do |one, two|
+  games << Game.create(:team_one => teams[one], :team_two => teams[two])
 end
 
-#Final 4
-game_one = Game.find_by_team_one_id(Team.find_by_region_and_seed(Team::MIDWEST, 1)).next_game.next_game.next_game
-game_two = Game.find_by_team_one_id(Team.find_by_region_and_seed(Team::WEST, 1)).next_game.next_game.next_game
-champ_one = Game.create :game_one => game_one, :game_two => game_two
+[1, 4, 2, 3].each_with_index do |seed, i|
+  games << Game.create(:team_one => teams[seed], :game_two => games[i+1])
+end
 
-game_one = Game.find_by_team_one_id(Team.find_by_region_and_seed(Team::SOUTH, 1)).next_game.next_game.next_game
-game_two = Game.find_by_team_one_id(Team.find_by_region_and_seed(Team::EAST, 1)).next_game.next_game.next_game
-champ_two = Game.create :game_one => game_one, :game_two => game_two
-
-#Championship
-Game.create :game_one => champ_one, :game_two => champ_two
+[[5,6],[7,8],[9,10]].each do |x, y|
+  games << Game.create(:game_one => games[x], :game_two => games[y])
+end
