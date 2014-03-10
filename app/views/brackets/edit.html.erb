@@ -58,8 +58,7 @@
 
         //championship
         if(transition === undefined) {
-
-            var slot_node = $(".square1");
+            var slot_node = $("div#winner > .slot");
 
             slot_node.html($(this).html());
 
@@ -142,7 +141,7 @@
     }
 
     function clearChampionship(team_id) {
-        var champ_node = $("div#championship > div.box > p.team" + team_id);
+        var champ_node = $("div#winner > > .team" + team_id);
         if(champ_node[0] === undefined) {
             return;
         }

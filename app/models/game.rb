@@ -36,7 +36,7 @@ class Game < ActiveRecord::Base
   end
 
   def round
-    round = 6 #championship
+    round = 4 #championship
     n = self.next_game
     while n.present?
       round -= 1
@@ -53,17 +53,18 @@ class Game < ActiveRecord::Base
 
   def self.round_for(round_number, region=nil)
     case round_number
-      when 5
+      when 3
         [Game.championship.game_one, Game.championship.game_two]
-      when 6
+      when 4
         [Game.championship]
       when 1
-        sort_order = [1, 8, 5, 4, 6, 3, 7, 2]
-        teams = region.present? ? Team.where(:region => region) : Team
-
-        teams.all.collect(&:first_game).uniq.sort_by {|x| sort_order.index(x.first_team.seed)}
-      else
-        Game.round_for(round_number - 1, region).collect(&:next_game).uniq
+        sort_order = [8, 5, 7, 6]
+        teams = Team.where(:seed => sort_order).all
+        Game.where(:team_one_id => teams.collect(&:id)).all.sort_by {|x| sort_order.index(x.first_team.seed)}
+      when 2
+        sort_order = [1, 4, 2, 3]
+        teams = Team.where(:seed => sort_order).all
+        Game.where(:team_one_id => teams.collect(&:id)).all.sort_by {|x| sort_order.index(x.first_team.seed)}
     end
   end
 end

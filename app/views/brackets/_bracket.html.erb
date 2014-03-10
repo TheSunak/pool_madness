@@ -1,50 +1,51 @@
 <div id="content-wrapper">
   <div id="table">
-
-    <!-- Table Dates -->
-    <table class="gridtable">
-      <tr>
-        <th class="round_1 current"> 1st ROUND </th>
-        <th class="round_2 "> 2nd ROUND </th>
-        <th class="round_3"> SWEET 16 </th>
-        <th class="round_4"> ELITE EIGHT </th>
-        <th class="round_5"> FINAL FOUR </th>
-        <th class="round_6"> CHAMPION </th>
-        <th class="round_5"> FINAL FOUR </th>
-        <th class="round_4"> ELITE EIGHT </th>
-        <th class="round_3"> SWEET 16 </th>
-        <th class="round_2"> 2nd ROUND </th>
-        <th class="round_1 current"> 1st ROUND </th>
-      </tr>
-      <tr>
-        <td class="current"> March 21-22 </td>
-        <td> March 23-24 </td>
-        <td> March 28-29 </td>
-        <td> March 30-31 </td>
-        <td> April 6 </td>
-        <td> April 8 </td>
-        <td> April 6 </td>
-        <td> March 30-31 </td>
-        <td> March 28-29 </td>
-        <td> March 23-24 </td>
-        <td class="current"> March 21-22 </td>
-      </tr>
-    </table>
+    <%= image_tag '/images/header.png' %>
   </div>
 
   <!-- Bracket -->
   <div id="bracket">
-    <% (1..6).to_a.each do |round_num| %>
+    <% (1..4).to_a.each do |round_num| %>
         <%= render :partial => 'brackets/round', :locals => {:round_num => round_num, :bracket => (bracket ||= nil)} %>
     <% end %>
 
+    <% winner = bracket.present? ? bracket.picks.where(:game_id => Game.championship.id).first.team : Game.championship.winner %>
+
+    <div id="round5" class="round">
+      <h3>
+        Round 5
+      </h3>
+      <div class="region region1">
+        <div id="winner" class="match m1">
+          <p class="slot slot2 <%= "team#{winner.id}" if winner.present? %>">
+
+            <% if winner.present? %>
+                <% if Game.championship.winner.present? %>
+                    <% if Game.championship.winner == winner %>
+                        <strong>
+                    <% else %>
+                        <strike>
+                    <% end %>
+                <% end %>
+                <span class="seed"><%= winner.seed %></span>
+                <%= winner.name %>
+                <% if Game.championship.score_one.present? %><em class="score"><%= Game.championship.score_one %></em><% end %>
+                <% if Game.championship.winner.present? %>
+                    <% if Game.championship.winner != winner %>
+                        </strike>
+                    <% else %>
+                        </strong>
+                    <% end %>
+                <% end %>
+            <% end %>
+          </p>
+        </div>
+      </div>
+    </div>
+
     <% if bracket.present? %>
-    <div id="tie-breaker" class="pagination-centered"><span id="tie-breaker-static">Tie Breaker: <%= bracket.tie_breaker || 'None' %></span></div>
-        <% end %>
+        <div id="tie-breaker" class="pagination-centered"><span id="tie-breaker-static"><abbr title="Points in final game">Tie Breaker:</abbr> <%= bracket.tie_breaker || 'None' %></span></div>
+    <% end %>
   </div>
 
 </div>
-
-
-
-

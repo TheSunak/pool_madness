@@ -1,13 +1,10 @@
 <% first_team = pick.try(:first_team) || game.first_team %>
 <% second_team = pick.try(:second_team) || game.second_team %>
 
-<div id="match<%= game.id %>" class="match m<%= i+1 %>">
-  <p <% if game == Game.championship %>id="slot127"<% end %> class="slot slot1 <%= "team#{first_team.id}" if first_team.present? %>">
+<div id="match<%= game.id %>" class="match m<%= game.try(:round) == 1 ? i*2+2 : i+1 %>">
+  <p class="slot slot1 <%= "team#{first_team.id}" if first_team.present? %>">
 
     <% if first_team.present? %>
-
-
-
 
         <% if pick.present? %>
             <% game_one = pick.game.game_one %>
@@ -38,14 +35,9 @@
         <% end %>
 
 
-
-
-
-
         <span class="seed"><%= first_team.seed %></span>
         <%= first_team.name %>
         <% if game.score_one.present? && pick.blank? %><em class="score"><%= game.score_one %></em><% end %>
-
 
 
 
@@ -78,20 +70,14 @@
             <% end %>
         <% end %>
 
+    <% end #if first team present %>
 
-
-
-    <% end %>
 
 
   </p>
-
-
-  <p <% if game == Game.championship %>id="slot128"<% end %>class="slot slot2 <%= "team#{second_team.id}" if second_team.present? %>">
+  <p class="slot slot2 <%= "team#{second_team.id}" if second_team.present? %>">
 
     <% if second_team.present? %>
-
-
 
         <% if pick.present? %>
             <% game_two = pick.game.game_two %>
@@ -120,6 +106,12 @@
 
 
         <% end %>
+
+
+
+
+
+
 
 
 
@@ -161,6 +153,8 @@
 
 
 
-    <% end %>
+
+
+    <% end #if second team present %>
   </p>
 </div>

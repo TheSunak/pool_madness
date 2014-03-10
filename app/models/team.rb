@@ -1,20 +1,11 @@
 class Team < ActiveRecord::Base
-  SOUTH = 'South'
-  WEST = 'West'
-  EAST = 'East'
-  MIDWEST = 'Midwest'
-
-  REGIONS = [MIDWEST, WEST, SOUTH, EAST]
-
-  attr_accessible :region, :seed, :name, :score_team_id
+  attr_accessible :seed, :name, :score_team_id
 
   validates :name, :uniqueness => true, :length => {:maximum => 15}
 
-  validates :region, :inclusion => {:in => [SOUTH, WEST, EAST, MIDWEST]}
-
   validates :seed,
-            :numericality => { :only_integer => true, :greater_than_or_equal_to => 1, :less_than_or_equal_to => 16 },
-            :uniqueness => { :scope => :region }
+            :numericality => { :only_integer => true, :greater_than_or_equal_to => 1, :less_than_or_equal_to => 12 },
+            :uniqueness => true
 
 
   def first_game
