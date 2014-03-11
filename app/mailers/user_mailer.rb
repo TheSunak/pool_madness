@@ -1,5 +1,5 @@
 class UserMailer < ActionMailer::Base
-  default from: "\"Haruska Pool Madness\" <#{ENV['ADMIN_EMAIL']}>"
+  default from: "\"#{ENV['ADMIN_NAME']}\" <#{ENV['ADMIN_EMAIL']}>"
 
   def welcome_message(user)
     @user = user
