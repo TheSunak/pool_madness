@@ -16,6 +16,20 @@ class Contact
     end
   end
 
+  #Overwrite people's names with what is in the sheet
+  def self.update_user_names(execute = false)
+    contacts = self.all
+
+    User.all.each do |user|
+      contact = contacts.find {|x| x.email == user.email}
+      if contact.present? && contact.name != user.name
+        puts "Changing #{contact.email} name from #{user.name} to #{contact.name}"
+
+        user.update_attribute(:name, contact.name) if execute
+      end
+    end
+  end
+
   def invite
     ContactMailer.invite(self).deliver
   end
