@@ -79,11 +79,13 @@ class PossibleOutcome < ActiveRecord::Base
 
   #FIXME, need to take into account ties
   def update_brackets_best_possible
-    self.sorted_brackets.each_with_index do |br, i|
+    sorted_brackets = self.sorted_brackets
+    sorted_brackets.each_with_index do |br, i|
       bracket_id, points = *br
       bracket = Bracket.find(bracket_id)
-      if bracket.best_possible > i
-        bracket.best_possible = i
+      index = sorted_brackets.index {|x, y| y == points}
+      if bracket.best_possible > index
+        bracket.best_possible = index
         bracket.save!
       end
     end
