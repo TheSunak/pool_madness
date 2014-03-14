@@ -8,12 +8,14 @@ class PossibleGame < ActiveRecord::Base
 
   delegate :team_one, :team_two, :to => :game
 
+  attr_accessible :game_id, :score_one, :score_two, :game_one_id, :game_two_id
+
   def first_team
-    self.team_one || self.game_one.winner
+    self.game.team_one || self.game_one.winner
   end
 
   def second_team
-    self.team_two || self.game_two.winner
+    self.game.team_two || self.game_two.winner
   end
 
   def winner
