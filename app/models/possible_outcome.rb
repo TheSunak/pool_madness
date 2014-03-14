@@ -27,10 +27,62 @@ class PossibleOutcome < ActiveRecord::Base
     end
   end
 
-  def self.generate_outcome(slot_bits)
-    Game.all.each do |game|
-      
+  def self.generate_all_outcomes
+    games = Game.all
+
+    games_mask = 0
+    already_played_mask = 0
+    winners = 0
+
+    games.each_with_index do |game, i|
+      games_mask ||= 1 << i
+      if game.score_one > 0
+        already_played_mask ||= 1 << i
+        if game.score_one < game.score_two
+          winners ||= 1 << i
+        end
+      end
+    end
+
+    (0..games_mask).each do |slot_bits|
+      if slot_bits && already_played_mask == winners
+        #valid slot_bits
+        generate_outcome(slot_bits)
+      end
     end
   end
 
+  def self.generate_outcome(slot_bits)
+    possible_outcome = self.create
+    Game.all.each_with_index do |game, i|
+      team_one_winner = slot_bits && (1 << i) == 0
+      score_one, score_two = team_one_winner ?  [2, 1] : [1, 2]
+      possible_outcome.create_possible_game :game_id => game.id, :score_one => score_one, :score_two => score_two
+    end
+    possible_outcome
+  end
+
+  #FIXME, need to take into account ties
+  def update_brackets_best_possible
+    self.sorted_brackets.each_with_index do |br, i|
+      bracket_id, points = *br
+      bracket = Bracket.find(bracket_id)
+      if bracket.best_possible > i
+        bracket.best_possible = i
+        bracket.save!
+      end
+    end
+  end
+
+  def sorted_brackets
+    result = Bracket.all.collect do |bracket|
+      points = bracket.picks.collect |pick|
+        pick.points(possibe_games.find(:game_id => pick.game_id))
+      end.sum
+
+      bracket_id, points
+    end
+
+    result.sort_by(&:last).reverse
+  end
 end
