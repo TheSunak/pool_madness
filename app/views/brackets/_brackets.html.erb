@@ -6,6 +6,7 @@
     <% if Pool.started? %>
         <th>Score</th>
         <th>Possible</th>
+        <th>Best</th>
     <% end %>
     <th>Final Four</th>
     <th>Final Four</th>
@@ -24,6 +25,7 @@
       <tr id="bracket-row-<%= bracket.id %>">
         <td>
           <%= link_to bracket do %>
+            <% if bracket.best_possible > 2 %>*<% end %>
             <% if bracket.name =~ /#{Regexp.escape(bracket.user.name)}/ %>
               <%= bracket.name %>
             <% else %>
@@ -35,6 +37,7 @@
         <% if Pool.started? %>
             <td><%= bracket.points %></td>
             <td><%= bracket.possible_points %></td>
+            <td><%= bracket.best_possible > 2 ? '-' : bracket.best_possible + 1 %></td>
         <% end %>
 
         <% bracket.sorted_four.each do |team| %>
