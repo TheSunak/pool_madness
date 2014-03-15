@@ -110,7 +110,6 @@ class PossibleOutcome < ActiveRecord::Base
       points = bracket.picks.collect do |pick|
         pick.points(possible_games.find_by_game_id(pick.game_id))
       end.sum
-      puts "#{[bracket.id, points]}"
       [bracket.id, points]
     end
 
