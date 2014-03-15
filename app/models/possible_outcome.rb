@@ -27,6 +27,21 @@ class PossibleOutcome < ActiveRecord::Base
     end
   end
 
+  def self.update_all
+    PossibleOutcome.destroy_all
+    PossibleGame.destroy_all
+    PossibleOutcome.generate_all_outcomes
+    
+    Bracket.all.each do |bracket|
+      bracket.best_possible = 10000
+      bracket.save!
+    end
+
+    PossibleOutcome.all.each do |po|
+      po.update_brackets_best_possible
+    end
+  end
+
   def self.generate_all_outcomes
     games = Game.all
 
@@ -77,7 +92,6 @@ class PossibleOutcome < ActiveRecord::Base
     possible_outcome
   end
 
-  #FIXME, need to take into account ties
   def update_brackets_best_possible
     sorted_brackets = self.sorted_brackets
     sorted_brackets.each_with_index do |br, i|
