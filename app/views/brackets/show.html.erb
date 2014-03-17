@@ -1,4 +1,12 @@
-<h3 class="pagination-centered"><%= "#{@bracket.name} Bracket" %></h3>
+<h3 class="pagination-centered">
+  <% if @bracket.name =~ /#{Regexp.escape(@bracket.user.name)}/ %>
+      <%= @bracket.name %>
+  <% else %>
+      <abbr title="<%= @bracket.user.name %>"><%= @bracket.name %></abbr>
+  <% end %>
+
+  Bracket
+</h3>
 
 <% if @bracket.incomplete? %>
     <div class="alert alert-block fade in">
@@ -14,7 +22,6 @@
       <p>This bracket entry is marked unpaid. <strong>All unpaid brackets will be removed from the pool this Thursday at Noon</strong>.</p>
       <p>Note: you can still edit your bracket right up until tip off this Thursday, even after you pay the entry fee.</p>
       <p>
-        <%= link_to 'Pay with Bitcoin', 'https://coinbase.com/checkouts/625548a208757aa2f1b709600e12e5ef', :class => "bitcoin-pay btn btn-primary" %>
         <%= link_to 'Pay with Credit Card', bracket_stripes_path(@bracket), :class => 'btn btn-primary stripe-pay' %>
       </p>
     </div>
@@ -31,7 +38,6 @@
     <% if @bracket.paid? %>
         Paid: $10.00
     <% else %>
-        <%= link_to 'Pay with Bitcoin', 'https://coinbase.com/checkouts/625548a208757aa2f1b709600e12e5ef', :class => "bitcoin-pay btn btn-primary" %>
         <%= link_to 'Pay with Credit Card', bracket_stripes_path(@bracket), :class => 'btn btn-primary stripe-pay' %>
     <% end %>
   </div>
@@ -43,26 +49,10 @@
   </div>
 </div>
 
-<% if !@bracket.paid? && !@bracket.pending? %>
-
-
-  <div class="coinbase-button" data-code="625548a208757aa2f1b709600e12e5ef" data-button-style="none" data-custom="<%= @bracket.id %>" ></div>
+<% if !@bracket.paid? %>
   <%= form_tag bracket_stripes_path(@bracket), :id => 'stripe-form' %>
 
   <script type="text/javascript">
-    $('.bitcoin-pay').click(function() {
-        $(document).trigger('coinbase_show_modal', '625548a208757aa2f1b709600e12e5ef');
-        return false;
-    });
-
-    $(document).on('coinbase_payment_complete', function(event, code){
-        $.ajax({
-            url: '/brackets/<%= @bracket.id %>',
-            type: 'POST',
-            data: {_method: 'PUT', bracket: {pending_payment: true}},
-            success: function() { location.reload(); }
-        });
-    });
 
         $('.stripe-pay').click(function(){
             var token = function(res){
@@ -75,6 +65,7 @@
                 name: 'Pool Madness',
                 description: 'One Bracket Entry + CC Fee ($10.00 + $0.61)',
                 amount: '1061',
+                email: '<%= @bracket.user.email %>',
                 token:   token
             });
 
