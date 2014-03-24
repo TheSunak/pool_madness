@@ -68,7 +68,7 @@ class PossibleOutcome < ActiveRecord::Base
     end
   end
 
-  def generate_outcome(slot_bits)
+  def self.generate_outcome(slot_bits)
     games = Game.where('score_one > 0').order(:id).all
     games += Game.where('id NOT IN (?)', games.collect(&:id)).order(:id).all
 
