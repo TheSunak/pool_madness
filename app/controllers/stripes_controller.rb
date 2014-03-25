@@ -15,8 +15,8 @@ class StripesController < ApplicationController
 
     charge = Stripe::Charge.create(
         :customer    => customer.id,
-        :amount      => 1061, #Amount in cents ($10.00)
-        :description => "id: #{bracket.id}",
+        :amount      => 1000, #Amount in cents ($10.00)
+        :description => "s16 id: #{bracket.id}",
         :currency    => 'usd'
     )
 
@@ -25,7 +25,7 @@ class StripesController < ApplicationController
 
     bracket.payment_received!
 
-    redirect_to bracket, :notice => "Payment of $10.61 was successful."
+    redirect_to bracket, :notice => "Payment of $10.00 was successful."
 
   rescue Stripe::CardError => e
     redirect_to bracket, :alert => e.message

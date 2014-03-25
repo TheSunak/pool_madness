@@ -63,9 +63,10 @@
             StripeCheckout.open({
                 key: '<%= Rails.configuration.stripe[:publishable_key] %>',
                 name: 'Pool Madness',
-                description: 'One Bracket Entry + CC Fee ($10.00 + $0.61)',
-                amount: '1061',
+                description: 'One Bracket Entry',
+                amount: '1000',
                 email: '<%= @bracket.user.email %>',
+                allowRememberMe: false,
                 token:   token
             });
 
