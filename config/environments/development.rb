@@ -11,7 +11,7 @@ PoolMadness::Application.configure do
 
   # Show full error reports and disable caching
   config.consider_all_requests_local       = true
-  config.action_controller.perform_caching = true
+  config.action_controller.perform_caching = false
 
   # ActionMailer Config
   config.action_mailer.default_url_options = { :host => 'mm:3000' }
@@ -54,4 +54,5 @@ PoolMadness::Application.configure do
 
   # Expands the lines which load the assets
   config.assets.debug = true
+
 end

@@ -1,27 +1,58 @@
-<div id="round<%=round_num%>" class="round">
-  <h3>
-    Round <%= round_num %> (NCAA Men's Basketball Tournament)
-  </h3>
-  <% if round_num < 5 %>
-      <% Team::REGIONS.each_with_index do |region, region_num| %>
-          <div class="region region<%= region_num + 1 %>">
-            <h4 class="region<%= region_num + 1 %>">
-              <%= region %>
-            </h4>
-            <%= render :partial => 'brackets/game_set', :locals => {:games => Game.round_for(round_num, region), :bracket => (bracket ||= nil)} %>
-          </div>
-      <% end %>
-  <% else %>
-      <div class="region">
-        <%= render :partial => 'brackets/game_set', :locals => {:games => Game.round_for(round_num, nil), :bracket => (bracket ||= nil)} %>
+<% if round_num != 4 %>
+<div id="round<%=round_num +2 %>" class="round">
+
+
+  <% if round_num < 3 %>
+      <div class="region region1">
+        <%= render :partial => 'brackets/game_set', :locals => {:games => Game.round_for(round_num, 'South') + Game.round_for(round_num, 'East'), :bracket => (bracket ||= nil)} %>
+      </div>
+
+      <div class="region region3">
+        <%= render :partial => 'brackets/game_set', :locals => {:games => Game.round_for(round_num, 'West') + Game.round_for(round_num, 'Midwest'), :bracket => (bracket ||= nil)} %>
+      </div>
+  <% elsif round_num == 3 %>
+      <div class="region region1">
+        <%= render :partial => 'brackets/game_set', :locals => {:games => [Game.round_for(round_num).first], :bracket => (bracket ||= nil)} %>
+      </div>
+
+      <div class="region region3">
+        <%= render :partial => 'brackets/game_set', :locals => {:games => [Game.round_for(round_num).last], :bracket => (bracket ||= nil)} %>
       </div>
   <% end %>
 </div>
 
-<% if round_num == 6 %>
+
+<% else #championship %>
+
     <% game = Game.championship %>
     <% pick = bracket.present? ? bracket.picks.where(:game_id => game.id).first : nil %>
     <% team = pick.try(:team) || game.winner %>
+    <% first_team = pick.try(:first_team) || game.first_team %>
+    <% second_team = pick.try(:second_team) || game.second_team %>
+
+    <div id="round6" class="round">
+      <div id="match15" class="match">
+        <div id="region1champ">
+
+          <p id="slot127" class="slot slot1 <%= "team#{first_team.id}" if first_team.present? %>">
+            <% if first_team.present? %>
+                <span class="seed"><%= first_team.seed %></span>
+                <%= first_team.name %>
+                <% if game.score_one.present? && pick.blank? %><em class="score"><%= game.score_one %></em><% end %>
+            <% end %>
+          </p>
+        </div>
+        <div id="region3champ">
+          <p id="slot128" style="margin-left:90px;" class="slot slot2 <%= "team#{second_team.id}" if second_team.present? %>">
+            <% if second_team.present? %>
+                <span class="seed"><%= second_team.seed %></span>
+                <%= second_team.name %>
+                <% if game.score_two.present? && pick.blank? %><em class="score"><%= game.score_two %></em><% end %>
+            <% end %>
+          </p>
+        </div>
+      </div>
+    </div>
 
 
     <div id="championship" class="round">
@@ -78,7 +109,6 @@
 <% end %>
 
 </p>
-<p class="square square2">CHAMPION</p>
     </div>
 </div>
 

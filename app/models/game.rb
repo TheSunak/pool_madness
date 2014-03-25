@@ -7,12 +7,6 @@ class Game < ActiveRecord::Base
 
   attr_accessible :team_one, :team_two, :game_one, :game_two, :score_one, :score_two
 
-  #TODO: belongs in a sweeper
-  after_update do |game|
-    Rails.cache.delete('views/all_brackets')
-    Bracket.select('id').all.each { |b| Rails.cache.delete("views/bracket-show-#{b.id}") }
-  end
-
   def first_team
     self.team_one || self.game_one.winner
   end
@@ -53,15 +47,13 @@ class Game < ActiveRecord::Base
 
   def self.round_for(round_number, region=nil)
     case round_number
-      when 5
+      when 3
         [Game.championship.game_one, Game.championship.game_two]
-      when 6
+      when 4
         [Game.championship]
       when 1
-        sort_order = [1, 8, 5, 4, 6, 3, 7, 2]
         teams = region.present? ? Team.where(:region => region) : Team
-
-        teams.all.collect(&:first_game).uniq.sort_by {|x| sort_order.index(x.first_team.seed)}
+        teams.all.collect(&:first_game).uniq.reverse
       else
         Game.round_for(round_number - 1, region).collect(&:next_game).uniq
     end

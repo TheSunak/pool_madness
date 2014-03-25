@@ -9,6 +9,7 @@
 
 <%= render @bracket %>
 
+<div class="bottom-form">
 <%= form_for @bracket do |f| %>
     <dl id="bracket-dl" class="dl-horizontal">
       <dt><%= f.label :name, "Bracket Name", :class => 'bracket-label' %></dt>
@@ -23,6 +24,7 @@
       <%= f.submit "Done", :class => 'btn btn-primary' %>
     </div>
 <% end %>
+  </div>
 
 <script type="text/javascript">
   var game_transitions = []; //hash of game id => [next game_id, slot (1 or 2)]
@@ -82,7 +84,7 @@
           var next_game_id = transition[0];
           var next_slot = transition[1];
 
-          var slot_node = $("div#match" + next_game_id + " > .slot" + next_slot);
+          var slot_node = $("div#match" + next_game_id + " .slot" + next_slot);
 
 
             //get team in next slot
@@ -116,7 +118,7 @@
     });
 
     function clearSelection(prev_game_id, from_game_id, team_id) {
-        var slot_node = $("div#match" + from_game_id + " > .team" + team_id);
+        var slot_node = $("div#match" + from_game_id + " .team" + team_id);
         if(slot_node[0] === undefined) {
             return;
 

@@ -17,124 +17,47 @@ user = User.find_or_create_by_email :name => ENV['ADMIN_NAME'].dup, :email => EN
 puts 'user: ' << user.name
 user.add_role :admin
 
-{
-    Team::MIDWEST => [
-        'Wichita St',
-        'Michigan',
-        'Duke',
-        'Louisville',
-        'St Louis',
-        'UMass',
-        'Texas',
-        'Kentucky',
-        'Kansas St',
-        'Arizona St',
-        'Play-In MW11',
-        'Play-In MW12',
-        'Manhattan',
-        'Mercer',
-        'Wofford',
-        'Play-In MW16'
-    ],
-    Team::WEST => [
-        'Arizona',
-        'Wisconsin',
-        'Creighton',
-        'San Diego St',
-        'Oklahoma',
-        'Baylor',
-        'Oregon',
-        'Gonzaga',
-        'Oklahoma St',
-        'BYU',
-        'Nebraska',
-        'N Dakota St',
-        'New Mex St',
-        'UL-Lafayette',
-        'American',
-        'Weber St'
-    ],
-    Team::SOUTH => [
-        'Florida',
-        'Kansas',
-        'Syracuse',
-        'UCLA',
-        'VCU',
-        'Ohio St',
-        'New Mexico',
-        'Colorado',
-        'Pittsburgh',
-        'Stanford',
-        'Dayton',
-        'SF Austin',
-        'Tulsa',
-        'W Michigan',
-        'E Kentucky',
-        'Play-In S16'
-    ],
-    Team::EAST => [
-        'Virginia',
-        'Villanova',
-        'Iowa St',
-        'Michigan St',
-        'Cincinnati',
-        'N Carolina',
-        'Connecticut',
-        'Memphis',
-        'George Wash',
-        'St Joes',
-        'Providence',
-        'Harvard',
-        'Delaware',
-        'NC Central',
-        'UW Milwaukee',
-        'Coast Car'
-    ]
-}.each do |region, team_names|
-  team_names.each_with_index do |name, i|
-    Team.create :region => region, :seed => i+1, :name => name
-  end
+
+[
+    {:name=>"Florida", :seed=>1, :score_team_id=>62, :region=>"South"},
+    {:name=>"UCLA", :seed=>4, :score_team_id=>113, :region=>"South"},
+    {:name=>"Dayton", :seed=>11, :score_team_id=>49, :region=>"South"},
+    {:name=>"Stanford", :seed=>10, :score_team_id=>85, :region=>"South"},
+
+    {:name=>"Virginia", :seed=>1, :score_team_id=>105, :region=>"East"},
+    {:name=>"Michigan St", :seed=>4, :score_team_id=>64, :region=>"East"},
+    {:name=>"Iowa St", :seed=>3, :score_team_id=>111, :region=>"East"},
+    {:name=>"Connecticut", :seed=>7, :score_team_id=>66, :region=>"East"},
+
+    {:name=>"Arizona", :seed=>1, :score_team_id=>88, :region=>"West"},
+    {:name=>"San Diego St", :seed=>4, :score_team_id=>80, :region=>"West"},
+    {:name=>"Baylor", :seed=>6, :score_team_id=>84, :region=>"West"},
+    {:name=>"Wisconsin", :seed=>2, :score_team_id=>52, :region=>"West"},
+
+    {:name=>"Kentucky", :seed=>8, :score_team_id=>109, :region=>"Midwest"},
+    {:name=>"Louisville", :seed=>4, :score_team_id=>78, :region=>"Midwest"},
+    {:name=>"Tennessee", :seed=>11, :score_team_id=>39, :region=>"Midwest"},
+    {:name=>"Michigan", :seed=>2, :score_team_id=>68, :region=>"Midwest"}
+].each do |team_hash|
+  Team.create team_hash
 end
 
-Team::REGIONS.each do |region|
-  #64 teams
-  i, j = 1, 16
-  while i < j
-    team_one = Team.find_by_region_and_seed(region, i)
-    team_two = Team.find_by_region_and_seed(region, j)
-    Game.create :team_one => team_one, :team_two => team_two
-    i += 1
-    j -= 1
-  end
+#Sweet 16
+Team.all.each_slice(2) do |one, two|
+  Game.create :team_one => one, :team_two => two
+end
 
-  #32 teams
-  [[1,8], [5,4], [6,3], [7,2]].each do |one, two|
-    game_one = Game.find_by_team_one_id(Team.find_by_region_and_seed(region, one))
-    game_two = Game.find_by_team_one_id(Team.find_by_region_and_seed(region, two))
-    Game.create :game_one => game_one, :game_two => game_two
-  end
-
-  #Sweet 16
-  [[1,5], [6, 7]].each do |one, two|
-    game_one = Game.find_by_team_one_id(Team.find_by_region_and_seed(region, one)).next_game
-    game_two = Game.find_by_team_one_id(Team.find_by_region_and_seed(region, two)).next_game
-    Game.create :game_one => game_one, :game_two => game_two
-  end
-
-  #Great 8
-  game_one = Game.find_by_team_one_id(Team.find_by_region_and_seed(region, 1)).next_game.next_game
-  game_two = Game.find_by_team_one_id(Team.find_by_region_and_seed(region, 6)).next_game.next_game
-  Game.create :game_one => game_one, :game_two => game_two
+#Great 8
+great8 = []
+Game.all.each_slice(2) do |one, two|
+  great8 << Game.create(:game_one => one, :game_two => two)
 end
 
 #Final 4
-game_one = Game.find_by_team_one_id(Team.find_by_region_and_seed(Team::MIDWEST, 1)).next_game.next_game.next_game
-game_two = Game.find_by_team_one_id(Team.find_by_region_and_seed(Team::WEST, 1)).next_game.next_game.next_game
-champ_one = Game.create :game_one => game_one, :game_two => game_two
-
-game_one = Game.find_by_team_one_id(Team.find_by_region_and_seed(Team::SOUTH, 1)).next_game.next_game.next_game
-game_two = Game.find_by_team_one_id(Team.find_by_region_and_seed(Team::EAST, 1)).next_game.next_game.next_game
-champ_two = Game.create :game_one => game_one, :game_two => game_two
+final4 = []
+great8.each_slice(2) do |one, two|
+  final4 << Game.create(:game_one => one, :game_two => two)
+end
 
 #Championship
-Game.create :game_one => champ_one, :game_two => champ_two
+Game.create :game_one => final4.first, :game_two => final4.last
