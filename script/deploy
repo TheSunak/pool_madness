@@ -28,7 +28,7 @@ git add .
 git ci -m"precompile assets for heroku"
 git push -f sweet16 master
 bundle exec rake figaro:heroku[sweet16] #[${heroku_app}]
-heroku run rake db:migrate --remote sweet16 --app sweet16
+heroku run rake db:migrate --app sweet16
 
 #git rm -r public/assets
 #git ci -m"remove precomiled assets post deploy"
