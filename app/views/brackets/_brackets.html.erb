@@ -42,7 +42,7 @@
             <td><%= bracket.possible_points %></td>
         <% end %>
         <% if Pool.start_eliminating? %>
-            <td><%= bracket.best_possible > 2 ? '-' : bracket.best_possible + 1 %></td>
+            <td><%= bracket.best_possible > 0 ? '-' : bracket.best_possible + 1 %></td>
         <% end %>
 
         <% bracket.sorted_four.each do |team| %>

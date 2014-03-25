@@ -10,7 +10,7 @@ class BracketsController < ApplicationController
 
   def index
     if Pool.started?
-      @brackets.sort_by! {|x| [100000 - [x.best_possible, 4].min, x.points, x.possible_points]}
+      @brackets.sort_by! {|x| [100000 - [x.best_possible, 1].min, x.points, x.possible_points]}
       @brackets.reverse!
     else
       @brackets.sort_by! {|x| [[:ok, :unpaid, :incomplete].index(x.status), x.name]}
