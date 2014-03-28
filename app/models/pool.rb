@@ -6,6 +6,6 @@ class Pool
   end
 
   def self.start_eliminating?
-    DateTime.now > TIP_OFF + 1.day
+    DateTime.now > DateTime.new(2014, 3, 28, 4, 0, 0, '-4')
   end
 end
