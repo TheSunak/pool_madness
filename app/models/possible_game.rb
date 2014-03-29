@@ -54,7 +54,7 @@ class PossibleGame
 
     return @round unless @round.nil?
 
-    @round = 6 #championship
+    @round = 4 #championship
     n = self.next_game
     while n.present?
       @round -= 1
